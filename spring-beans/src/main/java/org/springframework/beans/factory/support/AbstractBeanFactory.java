@@ -1335,7 +1335,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 							//递归 合并
 							pbd = getMergedBeanDefinition(parentBeanName);
 						}
-						else {//如果一样 父bean一定在父容器？
+						else {
+							//一般不会走到这里
+							//到父容器找到对应的bean，然后进行合并 合并也发生在父容器里
 							BeanFactory parent = getParentBeanFactory();
 							if (parent instanceof ConfigurableBeanFactory) {
 								//如果父bean有父bean，存储递归合并
@@ -1369,6 +1371,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				// Let's correct this on the fly here, since this might be the result of
 				// parent-child merging for the outer bean, in which case the original inner bean
 				// definition will not have inherited the merged outer bean's singleton status.
+				//里面一层的是否单例跟随外层
+				//比如外层单例 依赖的是原形，那就都是单例 待验证
+				//比如外层原形 依赖的是单例，那就都是原形
 				if (containingBd != null && !containingBd.isSingleton() && mbd.isSingleton()) {
 					mbd.setScope(containingBd.getScope());
 				}

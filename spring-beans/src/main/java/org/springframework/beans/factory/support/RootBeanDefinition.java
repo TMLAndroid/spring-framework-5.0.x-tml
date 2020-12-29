@@ -50,6 +50,9 @@ import org.springframework.util.Assert;
  * @see GenericBeanDefinition
  * @see ChildBeanDefinition
  */
+//Spring启动会实例化几个初始化的BD,这几个都是RootBeanDefinition
+//Spring合并BD返回的是RootBeanDefinition
+//@Bean返回配置bean 都是RootBeanDefinition(实际是子类 ConfigurationClassBeanDefinition)
 @SuppressWarnings("serial")
 public class RootBeanDefinition extends AbstractBeanDefinition {
 

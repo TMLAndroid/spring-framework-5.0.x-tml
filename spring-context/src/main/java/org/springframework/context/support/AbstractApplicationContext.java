@@ -560,9 +560,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				initMessageSource();
 
 				// Initialize event multicaster for this context.
-				//初始化事件多播器
+				//初始化事件广播器
 				//3.4.1>i8
-				//注册事件监听器到多播器上
+				//初始化事件广播器
 				initApplicationEventMulticaster();
 
 				// Initialize other special beans in specific context subclasses.
@@ -571,9 +571,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				onRefresh();
 
 				// Check for listener beans and register them.
-				//上上步的注册事件多播器
+				//上上步的注册事件广播器
 				//3.4.1>i10
-				//把事件监听器注册到多播器上
+				//把事件监听器注册到广播器上
 				registerListeners();
 
 				//在这之前 类没有进行实例化
@@ -819,7 +819,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void initApplicationEventMulticaster() {
 		ConfigurableListableBeanFactory beanFactory = getBeanFactory();
-		//判断容器是否包含多播器
+		//判断容器是否包含广播器
 		if (beanFactory.containsLocalBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME)) {
 			this.applicationEventMulticaster =
 					beanFactory.getBean(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, ApplicationEventMulticaster.class);
@@ -885,7 +885,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void registerListeners() {
 		// Register statically specified listeners first.
-		//把容器中ApplicationListener注册到多播器中(系统的)
+		//把容器中ApplicationListener注册到广播器中(系统的)
 		for (ApplicationListener<?> listener : getApplicationListeners()) {
 			getApplicationEventMulticaster().addApplicationListener(listener);
 		}

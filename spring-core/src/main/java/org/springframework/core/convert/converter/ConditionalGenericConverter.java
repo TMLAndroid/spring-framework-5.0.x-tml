@@ -30,6 +30,7 @@ import org.springframework.core.convert.TypeDescriptor;
  * @see GenericConverter
  * @see ConditionalConverter
  */
+//结合 GenericConverter & ConditionalConverter
 public interface ConditionalGenericConverter extends GenericConverter, ConditionalConverter {
 
 }

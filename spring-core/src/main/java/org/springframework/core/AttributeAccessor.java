@@ -25,6 +25,7 @@ import org.springframework.lang.Nullable;
  * @author Rob Harrop
  * @since 2.0
  */
+//从其它任意类获取或者设置元数据的一个通用规范
 public interface AttributeAccessor {
 
 	/**

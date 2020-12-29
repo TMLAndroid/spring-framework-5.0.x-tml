@@ -53,6 +53,7 @@ public interface GenericConverter {
 	 * <p>For {@link ConditionalConverter conditional converters} this method may return
 	 * {@code null} to indicate all source-to-target pairs should be considered.
 	 */
+	//获取能够转换的ConvertiblePair的集合，这个对象就是一组可以转换的类型
 	@Nullable
 	Set<ConvertiblePair> getConvertibleTypes();
 
@@ -63,6 +64,7 @@ public interface GenericConverter {
 	 * @param targetType the type descriptor of the field we are converting to
 	 * @return the converted object
 	 */
+	//根据源数据类型转换成目标类型数据
 	@Nullable
 	Object convert(@Nullable Object source, TypeDescriptor sourceType, TypeDescriptor targetType);
 
@@ -72,8 +74,10 @@ public interface GenericConverter {
 	 */
 	final class ConvertiblePair {
 
+		//源数据类型
 		private final Class<?> sourceType;
 
+		//目标数据类型
 		private final Class<?> targetType;
 
 		/**

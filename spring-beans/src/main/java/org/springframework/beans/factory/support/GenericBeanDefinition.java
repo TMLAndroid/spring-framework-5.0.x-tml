@@ -37,6 +37,8 @@ import org.springframework.util.ObjectUtils;
  * @see RootBeanDefinition
  * @see ChildBeanDefinition
  */
+//替换了原来ChildBD 比起ChildBD更灵活 不需要指定 parentName
+//通过注解配置，以及配置类(除了@Bean)BD类型都是GenericBeanDefinition
 @SuppressWarnings("serial")
 public class GenericBeanDefinition extends AbstractBeanDefinition {
 

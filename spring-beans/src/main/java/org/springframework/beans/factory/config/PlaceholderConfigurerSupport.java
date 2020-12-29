@@ -79,7 +79,7 @@ import org.springframework.util.StringValueResolver;
  * <pre class="code">
  *   <property name="url" value="jdbc:${dbname:defaultdb}"/>
  * </pre>
- *
+ *主要负责对占位符进行解析
  * @author Chris Beams
  * @author Juergen Hoeller
  * @since 3.1
@@ -90,6 +90,7 @@ public abstract class PlaceholderConfigurerSupport extends PropertyResourceConfi
 		implements BeanNameAware, BeanFactoryAware {
 
 	/** Default placeholder prefix: {@value} */
+//	默认解析前缀
 	public static final String DEFAULT_PLACEHOLDER_PREFIX = "${";
 
 	/** Default placeholder suffix: {@value} */

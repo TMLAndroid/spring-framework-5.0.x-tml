@@ -153,16 +153,23 @@ class TypeConverterDelegate {
 			@Nullable Class<T> requiredType, @Nullable TypeDescriptor typeDescriptor) throws IllegalArgumentException {
 
 		// Custom editor for this type?
+		//查看是否为当前这个类配置了定制的PropertyEditor
 		PropertyEditor editor = this.propertyEditorRegistry.findCustomEditor(requiredType, propertyName);
 
 		ConversionFailedException conversionAttemptEx = null;
 
 		// No custom editor but custom ConversionService specified?
+		//获取当前容器中类型转换业务类
 		ConversionService conversionService = this.propertyEditorRegistry.getConversionService();
+
+		//这里可以看出，Spring底层进行类型转换有两套
+		//首选PropertyEditor
+		//没有配置PropertyEditor 就采用conversionService
 		if (editor == null && conversionService != null && newValue != null && typeDescriptor != null) {
 			TypeDescriptor sourceTypeDesc = TypeDescriptor.forObject(newValue);
 			if (conversionService.canConvert(sourceTypeDesc, typeDescriptor)) {
 				try {
+					//通过conversionService进行类型转换
 					return (T) conversionService.convert(newValue, sourceTypeDesc, typeDescriptor);
 				}
 				catch (ConversionFailedException ex) {
@@ -175,6 +182,7 @@ class TypeConverterDelegate {
 		Object convertedValue = newValue;
 
 		// Value not of required type?
+		//配置了定制的属性编辑器，采用PropertyEditor进行属性转换
 		if (editor != null || (requiredType != null && !ClassUtils.isAssignableValue(requiredType, convertedValue))) {
 			if (typeDescriptor != null && requiredType != null && Collection.class.isAssignableFrom(requiredType) &&
 					convertedValue instanceof String) {
@@ -187,8 +195,10 @@ class TypeConverterDelegate {
 				}
 			}
 			if (editor == null) {
+				//没有配置 采用默认
 				editor = findDefaultEditor(requiredType);
 			}
+			//采用属性编辑器进行转换，需要注意的是，默认情况下PropertyEditor只会对String类型的值进行类型转换
 			convertedValue = doConvertValue(oldValue, convertedValue, requiredType, editor);
 		}
 

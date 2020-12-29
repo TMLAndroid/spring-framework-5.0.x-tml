@@ -57,6 +57,8 @@ class ApplicationListenerDetector implements DestructionAwareBeanPostProcessor, 
 
 
 	//标志当前类是否未单例
+	//singletonNames保存将要创建的bean名称以及Bean是否是单例
+	//在对象创建出来后，属性注入前执行
 	@Override
 	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
 		this.singletonNames.put(beanName, beanDefinition.isSingleton());
@@ -67,15 +69,17 @@ class ApplicationListenerDetector implements DestructionAwareBeanPostProcessor, 
 		return bean;
 	}
 
+	//整个Bean创建过程最后一个阶段执行，在对象呗初始化后执行
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) {
 		if (bean instanceof ApplicationListener) {
 			// potentially not detected as a listener by getBeanNamesForType retrieval
+			//判断是否是单例 是的话 添加到容器的监听器集合
 			Boolean flag = this.singletonNames.get(beanName);
 			if (Boolean.TRUE.equals(flag)) {
 				// singleton bean (top-level or inner): register on the fly
 				this.applicationContext.addApplicationListener((ApplicationListener<?>) bean);
-			}
+			}//如果不是单例，又是一个嵌套Bean，那么打印日志提示只有在单例的情况下才能作为时间监听器
 			else if (Boolean.FALSE.equals(flag)) {
 				if (logger.isWarnEnabled() && !this.applicationContext.containsBean(beanName)) {
 					// inner bean with other scope - can't reliably process events

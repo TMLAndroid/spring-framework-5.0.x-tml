@@ -39,24 +39,30 @@ import org.springframework.util.PropertiesPersister;
  * @author Juergen Hoeller
  * @since 1.2.2
  */
+//定义了属性加载的方法
 public abstract class PropertiesLoaderSupport {
 
 	/** Logger available to subclasses */
 	protected final Log logger = LogFactory.getLog(getClass());
 
+	//本地属性 可以直接在XML中属性
 	@Nullable
 	protected Properties[] localProperties;
 
 	protected boolean localOverride = false;
 
+	//根据地址找到相应的文件
 	@Nullable
 	private Resource[] locations;
 
+	//没有找到对应文件是否抛异常，false代表不抛出
 	private boolean ignoreResourceNotFound = false;
 
+	//对应文件资源的编码
 	@Nullable
 	private String fileEncoding;
 
+	//文件解析器
 	private PropertiesPersister propertiesPersister = new DefaultPropertiesPersister();
 
 

@@ -47,7 +47,7 @@ import org.springframework.util.StringValueResolver;
  * source search order through the container's {@code Environment}; however, exact preservation
  * of functionality may be maintained by continuing to use {@code PropertyPlaceholderConfigurer}.
  * </ul>
- *
+ *可以配置属性的解析顺序
  * @author Juergen Hoeller
  * @author Chris Beams
  * @since 02.10.2003
@@ -59,18 +59,21 @@ import org.springframework.util.StringValueResolver;
 public class PropertyPlaceholderConfigurer extends PlaceholderConfigurerSupport {
 
 	/** Never check system properties. */
+	/**不在系统属性查找*/
 	public static final int SYSTEM_PROPERTIES_MODE_NEVER = 0;
 
 	/**
 	 * Check system properties if not resolvable in the specified properties.
 	 * This is the default.
 	 */
+	/**如果配置文件没有找到 再去系统属性中查找*/
 	public static final int SYSTEM_PROPERTIES_MODE_FALLBACK = 1;
 
 	/**
 	 * Check system properties first, before trying the specified properties.
 	 * This allows system properties to override any other property source.
 	 */
+	// 先查找系统属性，没查到再去查找配置文件中的属性
 	public static final int SYSTEM_PROPERTIES_MODE_OVERRIDE = 2;
 
 

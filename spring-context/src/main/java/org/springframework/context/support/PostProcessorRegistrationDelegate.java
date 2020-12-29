@@ -87,6 +87,7 @@ final class PostProcessorRegistrationDelegate {
 
 			// First, invoke the BeanDefinitionRegistryPostProcessors that implement PriorityOrdered.
 			//这里会获取之前注入6个中的ConfigurationClassPostProcessor
+			//getBeanNamesForType 发生了一次BD合并
 			String[] postProcessorNames =
 					beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
 			for (String ppName : postProcessorNames) {
@@ -108,6 +109,7 @@ final class PostProcessorRegistrationDelegate {
 
 			// Next, invoke the BeanDefinitionRegistryPostProcessors that implement Ordered.
 			//查询容器是否有BeanDefinitionRegistryPostProcessor类型
+			//又发生一次BD合并
 			postProcessorNames = beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
 			for (String ppName : postProcessorNames) {
 				//排除已经处理过的，并且实现了Ordered接口
@@ -127,6 +129,7 @@ final class PostProcessorRegistrationDelegate {
 			boolean reiterate = true;
 			while (reiterate) {
 				reiterate = false;
+				//再进行了一次BD合并
 				postProcessorNames = beanFactory.getBeanNamesForType(BeanDefinitionRegistryPostProcessor.class, true, false);
 				for (String ppName : postProcessorNames) {
 					if (!processedBeans.contains(ppName)) {
@@ -218,7 +221,7 @@ final class PostProcessorRegistrationDelegate {
 		 * 企业容器查询注册为beanPostProcessor的BD
 		 * 在哪些地方注册了BD呢
 		 * 在调用AnnotationConfigApplicationContext的构造函数的new AnnotationBeanDefinitionReader地方注解bean
-		 * AnnotationConfigUtils.registerAnnotationConfigProcessors(this.register)
+		 * AnnotationConfigUtils.regisBeanDefinitionRegistryPostProcessorterAnnotationConfigProcessors(this.register)
 		 */
 		String[] postProcessorNames = beanFactory.getBeanNamesForType(BeanPostProcessor.class, true, false);
 

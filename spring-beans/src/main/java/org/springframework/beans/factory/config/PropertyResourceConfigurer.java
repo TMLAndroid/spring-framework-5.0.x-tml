@@ -43,7 +43,7 @@ import org.springframework.util.ObjectUtils;
  * <p>Property values can be converted after reading them in, through overriding
  * the {@link #convertPropertyValue} method. For example, encrypted values
  * can be detected and decrypted accordingly before processing them.
- *
+ *读取到的属性进行一些转换
  * @author Juergen Hoeller
  * @since 02.10.2003
  * @see PropertyOverrideConfigurer

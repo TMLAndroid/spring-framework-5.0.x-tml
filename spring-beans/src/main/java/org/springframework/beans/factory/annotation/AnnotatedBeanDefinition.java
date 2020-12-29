@@ -45,6 +45,8 @@ public interface AnnotatedBeanDefinition extends BeanDefinition {
 	 * @return the factory method metadata, or {@code null} if none
 	 * @since 4.1.1
 	 */
+	//这个和@Bean注解相关
+	//被@Bean注解的方法就解析成getFactoryMethodMetadata
 	@Nullable
 	MethodMetadata getFactoryMethodMetadata();
 
