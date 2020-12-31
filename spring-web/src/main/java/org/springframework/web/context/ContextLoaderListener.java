@@ -34,6 +34,7 @@ import javax.servlet.ServletContextListener;
  * @see #setContextInitializers
  * @see org.springframework.web.WebApplicationInitializer
  */
+//实现ServletContextListener 将Spring容器融入web容器中 javax.servlet
 public class ContextLoaderListener extends ContextLoader implements ServletContextListener {
 
 	/**
@@ -100,7 +101,7 @@ public class ContextLoaderListener extends ContextLoader implements ServletConte
 	 */
 	@Override
 	public void contextInitialized(ServletContextEvent event) {
-		initWebApplicationContext(event.getServletContext());
+		initWebApplicationContext(event.getServletContext());//在父容器ContextLoader实现
 	}
 
 

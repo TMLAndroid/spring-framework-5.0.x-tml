@@ -238,8 +238,11 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	 */
 	@Override
 	protected void initApplicationContext() throws BeansException {
+		//子类重写，不过spring并未实现 提供扩展
 		extendInterceptors(this.interceptors);
+		//加载拦截器
 		detectMappedInterceptors(this.adaptedInterceptors);
+		//归并拦截器
 		initInterceptors();
 	}
 
@@ -275,6 +278,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	 * @see #setInterceptors
 	 * @see #adaptInterceptor
 	 */
+	//合并拦截器 即<mvc:interceptors>中的拦截器和HandlerMapping中通过属性interceptors设置拦截器进行合并
 	protected void initInterceptors() {
 		if (!this.interceptors.isEmpty()) {
 			for (int i = 0; i < this.interceptors.size(); i++) {
@@ -282,6 +286,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 				if (interceptor == null) {
 					throw new IllegalArgumentException("Entry number " + i + " in interceptors array is null");
 				}
+				//适配加入 adaptedInterceptors 【调用】
 				this.adaptedInterceptors.add(adaptInterceptor(interceptor));
 			}
 		}
@@ -299,6 +304,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	 * @see org.springframework.web.context.request.WebRequestInterceptor
 	 * @see WebRequestHandlerInterceptorAdapter
 	 */
+	//适配 HandlerInterceptor 和WebRequestInterceptor
 	protected HandlerInterceptor adaptInterceptor(Object interceptor) {
 		if (interceptor instanceof HandlerInterceptor) {
 			return (HandlerInterceptor) interceptor;
@@ -347,7 +353,9 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 	 */
 	@Override
 	@Nullable
+	//实现自 HandlerMapping
 	public final HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
+		//getHandlerInternal子类实现
 		Object handler = getHandlerInternal(request);
 		if (handler == null) {
 			handler = getDefaultHandler();
@@ -361,7 +369,9 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 			handler = obtainApplicationContext().getBean(handlerName);
 		}
 
+		//请求封装成HandlerExecutionChain 【调用】
 		HandlerExecutionChain executionChain = getHandlerExecutionChain(handler, request);
+		//对跨域处理
 		if (CorsUtils.isCorsRequest(request)) {
 			CorsConfiguration globalConfig = this.globalCorsConfigSource.getCorsConfiguration(request);
 			CorsConfiguration handlerConfig = getCorsConfiguration(handler, request);
@@ -415,14 +425,16 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 				(HandlerExecutionChain) handler : new HandlerExecutionChain(handler));
 
 		String lookupPath = this.urlPathHelper.getLookupPathForRequest(request);
+		//迭代拦截器
 		for (HandlerInterceptor interceptor : this.adaptedInterceptors) {
+			//如果拦截器是MappedInterceptor 判断是否对handler拦截 是的情况下添加
 			if (interceptor instanceof MappedInterceptor) {
 				MappedInterceptor mappedInterceptor = (MappedInterceptor) interceptor;
 				if (mappedInterceptor.matches(lookupPath, this.pathMatcher)) {
 					chain.addInterceptor(mappedInterceptor.getInterceptor());
 				}
 			}
-			else {
+			else {//HandlerMapping直接添加 即通过HandlingMapping属性配置的拦截器
 				chain.addInterceptor(interceptor);
 			}
 		}

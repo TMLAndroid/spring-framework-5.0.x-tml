@@ -79,6 +79,7 @@ import org.springframework.web.context.support.StandardServletEnvironment;
  * @see #doPost
  */
 @SuppressWarnings("serial")
+//主要作用将servlet相关的init-param封装成bean属性，保存到Environment当中，从而可以在spring容器被其它bean访问
 public abstract class HttpServletBean extends HttpServlet implements EnvironmentCapable, EnvironmentAware {
 
 	/** Logger available to subclasses */
@@ -144,6 +145,7 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 	 * @throws ServletException if bean properties are invalid (or required
 	 * properties are missing), or if subclass initialization fails.
 	 */
+	//DispatcherServlet第一次加载调用init方法
 	@Override
 	public final void init() throws ServletException {
 		if (logger.isDebugEnabled()) {
@@ -151,13 +153,16 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 		}
 
 		// Set bean properties from init parameters.
+		//加载web.xml文件中的servlet标签中的init-param，其中含有springMVC的配置文件的名字和路径若没有，则默认为（servlet-name）-servlet.xml，默认路径为WEF—INF下，设置到DispatcherServlet中
 		PropertyValues pvs = new ServletConfigPropertyValues(getServletConfig(), this.requiredProperties);
 		if (!pvs.isEmpty()) {
 			try {
+				//创建BeanWrapper实例，为DispatcherServlet设置属性
 				BeanWrapper bw = PropertyAccessorFactory.forBeanPropertyAccess(this);
 				ResourceLoader resourceLoader = new ServletContextResourceLoader(getServletContext());
 				bw.registerCustomEditor(Resource.class, new ResourceEditor(resourceLoader, getEnvironment()));
 				initBeanWrapper(bw);
+				//把init-param中参数设置到DispatcherServlet
 				bw.setPropertyValues(pvs, true);
 			}
 			catch (BeansException ex) {
@@ -169,6 +174,8 @@ public abstract class HttpServletBean extends HttpServlet implements Environment
 		}
 
 		// Let subclasses do whatever initialization they like.
+		//调用子类（FrameworkServlet）进行初始化
+		//模板方法
 		initServletBean();
 
 		if (logger.isDebugEnabled()) {

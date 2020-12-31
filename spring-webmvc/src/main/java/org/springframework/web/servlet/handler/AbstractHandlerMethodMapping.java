@@ -216,6 +216,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 					}
 				}
 				if (beanType != null && isHandler(beanType)) {
+					//处理Controller和RequestMapping
 					detectHandlerMethods(beanName);
 				}
 			}
@@ -229,14 +230,19 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 * @see #getMappingForMethod
 	 */
 	protected void detectHandlerMethods(Object handler) {
+		//根据 name找到bean类型
 		Class<?> handlerType = (handler instanceof String ?
 				obtainApplicationContext().getType((String) handler) : handler.getClass());
 
 		if (handlerType != null) {
+			//获取真实的controller，如果是代理类获取父类
 			Class<?> userType = ClassUtils.getUserClass(handlerType);
+			//对真实的controller所有的方法进行解析和处理  key为方法对象，T为注解封装后的对象RequestMappingInfo
 			Map<Method, T> methods = MethodIntrospector.selectMethods(userType,
 					(MethodIntrospector.MetadataLookup<T>) method -> {
 						try {
+							// 调用子类RequestMappingHandlerMapping的getMappingForMethod方法进行处理，
+							// 即根据RequestMapping注解信息创建匹配条件RequestMappingInfo对象 【调用】
 							return getMappingForMethod(method, userType);
 						}
 						catch (Throwable ex) {
@@ -248,7 +254,9 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 				logger.debug(methods.size() + " request handler methods found on " + userType + ": " + methods);
 			}
 			methods.forEach((method, mapping) -> {
+				//找出 controller中可外部调用方法
 				Method invocableMethod = AopUtils.selectInvocableMethod(method, userType);
+				//注册处理方法 【调用】
 				registerHandlerMethod(handler, invocableMethod, mapping);
 			});
 		}
@@ -539,11 +547,15 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 			this.readWriteLock.readLock().unlock();
 		}
 
+		//mapping是RequestMappingInfo对象   handler是controller类的beanName   method为接口方法
 		public void register(T mapping, Object handler, Method method) {
 			this.readWriteLock.writeLock().lock();
 			try {
+				//beanName和method封装成HandlerMethod对象
 				HandlerMethod handlerMethod = createHandlerMethod(handler, method);
+				//验证RequestMappingInfo是否有对应不同的method，有则抛出异常
 				assertUniqueMethodMapping(handlerMethod, mapping);
+				//RequestMappingInfo和handlerMethod绑定
 				this.mappingLookup.put(mapping, handlerMethod);
 
 				if (logger.isInfoEnabled()) {
@@ -552,13 +564,14 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 
 				List<String> directUrls = getDirectUrls(mapping);
 				for (String url : directUrls) {
+					//url和RequestMappingInfo绑定   可以根据url找到RequestMappingInfo，再找到handlerMethod
 					this.urlLookup.add(url, mapping);
 				}
 
 				String name = null;
 				if (getNamingStrategy() != null) {
 					name = getNamingStrategy().getName(handlerMethod, mapping);
-					addMappingName(name, handlerMethod);
+					addMappingName(name, handlerMethod);//方法名和Method绑定
 				}
 
 				CorsConfiguration corsConfig = initCorsConfiguration(handler, method, mapping);
@@ -566,6 +579,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 					this.corsLookup.put(handlerMethod, corsConfig);
 				}
 
+				//将RequestMappingInfo  url  handlerMethod绑定到MappingRegistration对象  放入map
 				this.registry.put(mapping, new MappingRegistration<>(mapping, handlerMethod, directUrls, name));
 			}
 			finally {

@@ -61,7 +61,7 @@ public abstract class ApplicationObjectSupport implements ApplicationContextAwar
 
 
 	@Override
-	public final void setApplicationContext(@Nullable ApplicationContext context) throws BeansException {
+	public void setApplicationContext(@Nullable ApplicationContext context) throws BeansException {
 		if (context == null && !isContextRequired()) {
 			// Reset internal context state.
 			this.applicationContext = null;
@@ -75,7 +75,7 @@ public abstract class ApplicationObjectSupport implements ApplicationContextAwar
 			}
 			this.applicationContext = context;
 			this.messageSourceAccessor = new MessageSourceAccessor(context);
-			initApplicationContext(context);
+			initApplicationContext(context);//模板方法 调用子类
 		}
 		else {
 			// Ignore reinitialization if same context passed in.
