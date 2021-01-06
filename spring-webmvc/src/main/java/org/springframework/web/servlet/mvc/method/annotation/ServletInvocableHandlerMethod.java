@@ -115,7 +115,7 @@ public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
 
 		mavContainer.setRequestHandled(false);
 		Assert.state(this.returnValueHandlers != null, "No return value handlers");
-		try {
+		try {//【调用】
 			this.returnValueHandlers.handleReturnValue(
 					returnValue, getReturnValueType(returnValue), mavContainer, webRequest);
 		}

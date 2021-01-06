@@ -48,6 +48,7 @@
         <property name="suffix" value=".jsp"/>
     </bean>
 
+
 <!--	导入bean-->
 <!--	属性导入contentType-->
    <bean id="configFileView" class="com.luban.view.GenericFileView"
@@ -57,6 +58,6 @@
     <bean id="swfFileView" class="com.luban.view.GenericFileView"
           p:contentType="application/x-shockwave-flash" p:url="" scope="prototype"/>
 
-
+	<bean id="/name.do" class="com.luban.controller.HelloController"/>
 
 </beans> 

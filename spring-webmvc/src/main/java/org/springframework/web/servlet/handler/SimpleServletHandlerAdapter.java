@@ -52,6 +52,7 @@ import org.springframework.web.servlet.ModelAndView;
  * @see SimpleServletPostProcessor
  * @see org.springframework.web.servlet.mvc.ServletWrappingController
  */
+//此方式是为了在Spring中支持Servlet方式开发，即把Servlet适配为处理器handler
 public class SimpleServletHandlerAdapter implements HandlerAdapter {
 
 	@Override
@@ -64,6 +65,7 @@ public class SimpleServletHandlerAdapter implements HandlerAdapter {
 	public ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
 
+		//实质执行Servlet.service
 		((Servlet) handler).service(request, response);
 		return null;
 	}

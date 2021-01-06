@@ -37,10 +37,12 @@ import org.springframework.web.servlet.ModelAndView;
  * @see LastModified
  * @see HttpRequestHandlerAdapter
  */
+//Controller实现类的适配类
 public class SimpleControllerHandlerAdapter implements HandlerAdapter {
 
 	@Override
 	public boolean supports(Object handler) {
+		//判断是否是Controller
 		return (handler instanceof Controller);
 	}
 
@@ -49,6 +51,7 @@ public class SimpleControllerHandlerAdapter implements HandlerAdapter {
 	public ModelAndView handle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
 
+		//Controller.handleRequest
 		return ((Controller) handler).handleRequest(request, response);
 	}
 

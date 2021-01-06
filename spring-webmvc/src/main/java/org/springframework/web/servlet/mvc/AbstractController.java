@@ -154,16 +154,21 @@ public abstract class AbstractController extends WebContentGenerator implements 
 	public ModelAndView handleRequest(HttpServletRequest request, HttpServletResponse response)
 			throws Exception {
 
+		// 如果请求是OPTIONS请求  那就直接return null了  它一般用于跨域  所以设置上Allow这个请求头
+		//getAllowHeader()方法在WebContentGenerator里
 		if (HttpMethod.OPTIONS.matches(request.getMethod())) {
 			response.setHeader("Allow", getAllowHeader());
 			return null;
 		}
 
 		// Delegate to WebContentGenerator for checking and preparing.
+		// 指定supportedMethods后，看看这个request是否合法
 		checkRequest(request);
+		//处理response的cache缓存和缓存时间等等
 		prepareResponse(response);
 
 		// Execute handleRequestInternal in synchronized block if required.
+		//如果有需要 会给这个请求加上锁 在锁内执行
 		if (this.synchronizeOnSession) {
 			HttpSession session = request.getSession(false);
 			if (session != null) {
@@ -173,7 +178,7 @@ public abstract class AbstractController extends WebContentGenerator implements 
 				}
 			}
 		}
-
+		//子类实现
 		return handleRequestInternal(request, response);
 	}
 

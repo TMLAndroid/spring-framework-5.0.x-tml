@@ -6,8 +6,10 @@
  ******************************************************************************************/
 package com.luban.controller;
 
+import com.luban.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * @author guangqingzhong
@@ -30,6 +32,13 @@ public class SampleController {
 	 @RequestMapping("/swf/sample.swf")
 	 public String getSampleSwf() {
 		 return "SampleSwf.swf";
+	 }
+
+	 @RequestMapping("/user/get")
+	 @ResponseBody
+	 public User getUser(){
+
+	 	return null;
 	 }
 	 
 }

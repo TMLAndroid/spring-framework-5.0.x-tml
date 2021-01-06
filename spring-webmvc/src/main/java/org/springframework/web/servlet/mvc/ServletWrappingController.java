@@ -142,12 +142,15 @@ public class ServletWrappingController extends AbstractController
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
+		//设定关联哪个Servlet
 		if (this.servletClass == null) {
 			throw new IllegalArgumentException("'servletClass' is required");
 		}
+		//没有指定名字 就用beanName
 		if (this.servletName == null) {
 			this.servletName = this.beanName;
 		}
+		//对servlet进行init方法初始化
 		this.servletInstance = ReflectionUtils.accessibleConstructor(this.servletClass).newInstance();
 		this.servletInstance.init(new DelegatingServletConfig());
 	}
@@ -157,6 +160,7 @@ public class ServletWrappingController extends AbstractController
 	 * Invoke the wrapped Servlet instance.
 	 * @see javax.servlet.Servlet#service(javax.servlet.ServletRequest, javax.servlet.ServletResponse)
 	 */
+	//最终处理还是交给了servlet
 	@Override
 	protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
 			throws Exception {

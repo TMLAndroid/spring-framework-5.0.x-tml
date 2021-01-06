@@ -50,6 +50,7 @@ public class GenericFileViewResolver extends AbstractCachingViewResolver
         return this.order;
     }
 
+
     @Override
     protected View loadView(String viewName, Locale locale) throws Exception {
         if (location == null) {

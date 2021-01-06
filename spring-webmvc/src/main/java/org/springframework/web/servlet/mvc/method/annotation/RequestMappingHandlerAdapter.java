@@ -112,6 +112,7 @@ import org.springframework.web.util.WebUtils;
  * @see HandlerMethodArgumentResolver
  * @see HandlerMethodReturnValueHandler
  */
+//请求适配给@RequestMapping类型的Handler处理
 public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		implements BeanFactoryAware, InitializingBean {
 
@@ -129,6 +130,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 					AnnotationUtils.findAnnotation(method, ModelAttribute.class) != null);
 
 
+	//参数解析器 例如RequestParamMethodArgumentResolver 自定义参数注解解析器(eg @UserInfo 会涉及排序 插入最前面)
 	@Nullable
 	private List<HandlerMethodArgumentResolver> customArgumentResolvers;
 
@@ -138,6 +140,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	@Nullable
 	private HandlerMethodArgumentResolverComposite initBinderArgumentResolvers;
 
+	//返回值的处理器 实现类例如 ModelAndViewMethodReturnValueHandler
 	@Nullable
 	private List<HandlerMethodReturnValueHandler> customReturnValueHandlers;
 
@@ -648,6 +651,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		resolvers.add(new MatrixVariableMethodArgumentResolver());
 		resolvers.add(new MatrixVariableMapMethodArgumentResolver());
 		resolvers.add(new ServletModelAttributeMethodProcessor(false));
+		//解析方法参数
 		resolvers.add(new RequestResponseBodyMethodProcessor(getMessageConverters(), this.requestResponseBodyAdvice));
 		resolvers.add(new RequestPartMethodArgumentResolver(getMessageConverters(), this.requestResponseBodyAdvice));
 		resolvers.add(new RequestHeaderMethodArgumentResolver(getBeanFactory()));
@@ -781,29 +785,42 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		checkRequest(request);
 
 		// Execute invokeHandlerMethod in synchronized block if required.
+		//判断当前是否需要支持在同一个session中只能线性地处理请求
 		if (this.synchronizeOnSession) {
+			//获取当前请求session
 			HttpSession session = request.getSession(false);
 			if (session != null) {
+				//为当前session生成一个唯一的可以用于锁的key
 				Object mutex = WebUtils.getSessionMutex(session);
 				synchronized (mutex) {
+					//对HandlerMethod进行参数等的适配处理，并调用目标handler
 					mav = invokeHandlerMethod(request, response, handlerMethod);
 				}
 			}
 			else {
 				// No HttpSession available -> no mutex necessary
+				//不存在session，则直接对HandlerMethod进行适配
 				mav = invokeHandlerMethod(request, response, handlerMethod);
 			}
 		}
 		else {
 			// No synchronization on session demanded at all...
+			//如果当前不需要对session同步，直接对HandlerMethod进行适配
 			mav = invokeHandlerMethod(request, response, handlerMethod);
 		}
 
+		//判断当前请求头是否包含Cache-Control请求头，如果不包含，则对当前response进行处理
+		//为其设置过期时间
 		if (!response.containsHeader(HEADER_CACHE_CONTROL)) {
+			//如果当前SessionAttribute中存在配置的attributes，则为其设置过期时间
+			//这里SessionAttribute主要通过@SessionAttribute注解生成
 			if (getSessionAttributesHandler(handlerMethod).hasSessionAttributes()) {
 				applyCacheSeconds(response, this.cacheSecondsForSessionAttributeHandlers);
 			}
 			else {
+				// 如果当前不存在SessionAttributes，则判断当前是否存在Cache-Control设置，
+				// 如果存在，则按照该设置进行response处理，如果不存在，则设置response中的
+				// Cache的过期时间为-1，即立即失效
 				prepareResponse(response);
 			}
 		}
@@ -847,6 +864,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	 * @since 4.2
 	 * @see #createInvocableHandlerMethod(HandlerMethod)
 	 */
+	//核心处理流程
 	@Nullable
 	protected ModelAndView invokeHandlerMethod(HttpServletRequest request,
 			HttpServletResponse response, HandlerMethod handlerMethod) throws Exception {
@@ -882,6 +900,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 
 			if (asyncManager.hasConcurrentResult()) {
 				Object result = asyncManager.getConcurrentResult();
+				//视图 ModelAndView ?
 				mavContainer = (ModelAndViewContainer) asyncManager.getConcurrentResultContext()[0];
 				asyncManager.clearConcurrentResult();
 				if (logger.isDebugEnabled()) {
@@ -889,12 +908,12 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 				}
 				invocableMethod = invocableMethod.wrapConcurrentResult(result);
 			}
-
+			//【调用】
 			invocableMethod.invokeAndHandle(webRequest, mavContainer);
 			if (asyncManager.isConcurrentHandlingStarted()) {
 				return null;
 			}
-
+			//创建一个视图对象
 			return getModelAndView(mavContainer, modelFactory, webRequest);
 		}
 		finally {
@@ -999,7 +1018,9 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	private ModelAndView getModelAndView(ModelAndViewContainer mavContainer,
 			ModelFactory modelFactory, NativeWebRequest webRequest) throws Exception {
 
+		//调用
 		modelFactory.updateModel(webRequest, mavContainer);
+		//视图解析器
 		if (mavContainer.isRequestHandled()) {
 			return null;
 		}

@@ -201,6 +201,7 @@ public final class ModelFactory {
 			this.sessionAttributesHandler.cleanupAttributes(request);
 		}
 		else {
+			//底层调用request.setAttribute model作用域和request相同
 			this.sessionAttributesHandler.storeAttributes(request, defaultModel);
 		}
 		if (!container.isRequestHandled() && container.getModel() == defaultModel) {

@@ -86,7 +86,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	}
 
 
-	private boolean detectHandlerMethodsInAncestorContexts = false;
+	private boolean detectHandlerMethodsInAncestorContexts = false;//是否去父容器去拿
 
 	@Nullable
 	private HandlerMethodMappingNamingStrategy<T> namingStrategy;
@@ -186,6 +186,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 */
 	@Override
 	public void afterPropertiesSet() {
+		//初始化 URL method map
 		initHandlerMethods();
 	}
 

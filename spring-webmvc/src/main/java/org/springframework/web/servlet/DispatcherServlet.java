@@ -974,7 +974,8 @@ public class DispatcherServlet extends FrameworkServlet {
 				multipartRequestParsed = (processedRequest != request);
 
 				// Determine handler for the current request.
-				//根据请求信息获取handler(包括拦截器)
+				//根据请求信息获取handler(包括拦截器) 遍历HandlerMapping集合 调用getHandler,不为空
+				//HandlerMapping 核心实现类 RequestMappingHandlerMapping(处理@Controller @RequestMapping)
 				mappedHandler = getHandler(processedRequest);
 				if (mappedHandler == null) {
 					noHandlerFound(processedRequest, response);
@@ -982,7 +983,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				}
 
 				// Determine handler adapter for the current request.
-				//根据handler获取adapter
+				//根据handler获取adapter HandlerAdapter
 				HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());
 
 				// Process last-modified header, if supported by the handler.
@@ -998,7 +999,7 @@ public class DispatcherServlet extends FrameworkServlet {
 					}
 				}
 
-				//拦截器逻辑
+				//拦截器逻辑 执行perHandle
 				if (!mappedHandler.applyPreHandle(processedRequest, response)) {
 					return;
 				}
@@ -1013,7 +1014,7 @@ public class DispatcherServlet extends FrameworkServlet {
 
 				//给视图模型设置viewName
 				applyDefaultViewName(processedRequest, mv);
-				//拦截器逻辑
+				//拦截器逻辑 执行 postHandle
 				mappedHandler.applyPostHandle(processedRequest, response, mv);
 			}
 			catch (Exception ex) {
@@ -1024,7 +1025,8 @@ public class DispatcherServlet extends FrameworkServlet {
 				// making them available for @ExceptionHandler methods and other scenarios.
 				dispatchException = new NestedServletException("Handler dispatch failed", err);
 			}
-			//处理请求结果 私用了组件LocalResolver ViewResolver 和 ThemeResolver(view#render) 【调用】
+			//【调用】
+			//处理请求结果 调用了组件LocalResolver ViewResolver 和 ThemeResolver(view#render) 【调用】
 			processDispatchResult(processedRequest, response, mappedHandler, mv, dispatchException);
 		}
 		catch (Exception ex) {
@@ -1322,6 +1324,7 @@ public class DispatcherServlet extends FrameworkServlet {
 		String viewName = mv.getViewName();
 		if (viewName != null) {
 			// We need to resolve the view name.
+			//视图解析器 自己注入  自定义 解析出view
 			view = resolveViewName(viewName, mv.getModelInternal(), locale, request);
 			if (view == null) {
 				throw new ServletException("Could not resolve view with name '" + mv.getViewName() +
@@ -1345,6 +1348,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			if (mv.getStatus() != null) {
 				response.setStatus(mv.getStatus().value());
 			}
+			//视图渲染 转到tomcat处理
 			view.render(mv.getModelInternal(), request, response);
 		}
 		catch (Exception ex) {
@@ -1384,7 +1388,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	@Nullable
 	protected View resolveViewName(String viewName, @Nullable Map<String, Object> model,
 			Locale locale, HttpServletRequest request) throws Exception {
-
+		//视图解析器
 		if (this.viewResolvers != null) {
 			for (ViewResolver viewResolver : this.viewResolvers) {
 				View view = viewResolver.resolveViewName(viewName, locale);

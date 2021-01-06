@@ -154,6 +154,7 @@ public class InternalResourceView extends AbstractUrlBasedView {
 		}
 
 		// If already included or response already committed, perform include, else forward.
+		//判断 response流是否关了 关了
 		if (useInclude(request, response)) {
 			response.setContentType(getContentType());
 			if (logger.isDebugEnabled()) {
@@ -162,6 +163,7 @@ public class InternalResourceView extends AbstractUrlBasedView {
 			rd.include(request, response);
 		}
 
+		//没关
 		else {
 			// Note: The forwarded resource is supposed to determine the content type itself.
 			if (logger.isDebugEnabled()) {

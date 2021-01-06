@@ -452,6 +452,7 @@ public class ResourceHttpRequestHandler extends WebContentGenerator
 		checkRequest(request);
 
 		// Header phase
+		//加入缓存。。。。状态码 304 告诉浏览器缓存
 		if (new ServletWebRequest(request, response).checkNotModified(resource.lastModified())) {
 			logger.trace("Resource not modified - returning 304");
 			return;
